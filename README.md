@@ -112,3 +112,4 @@ Grâce a cette requête sur Grafana je vois bien le log :
 ```
 <img width="1587" height="851" alt="image" src="https://github.com/user-attachments/assets/da6b7ae3-34e7-40d7-b6de-a4de2ad3c9ed" />
 
+Cette vérification indique que Grafana Alloy détecte automatiquement la rotation des fichiers et poursuit sa collecte de logs sans perte de données.
