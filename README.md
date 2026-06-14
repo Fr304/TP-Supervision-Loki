@@ -74,6 +74,7 @@ sudo nano /var/log/apps/app.log
 INFO Application démarrée
 ERROR Connexion base de données impossible
 ```
+
 La configuration Alloy mise en place surveille déjà les fichiers de log présents dans le répertoire **/var/log**. Le fichier **app.log** sera donc détecté automatiquement.
 
 ```bash
@@ -85,5 +86,29 @@ Sur Grafana, je vois bien que les lignes de logs sont bien visibles :
 <img width="1603" height="857" alt="image" src="https://github.com/user-attachments/assets/40794a93-8c0b-4074-ae77-b644ed27a810" />
 <img width="1571" height="855" alt="image" src="https://github.com/user-attachments/assets/9a566523-a1ab-481f-b507-03720dfc2180" />
 
+Nous allons à présent tester la rotation des logs. L'objectif est de m'assurer que, lorsque le fichier de log est renommé, modifié ou recréé, Alloy parvienne toujours à lire les logs.
 
+Pour faire cela, je vais renommer le fichier **app.log** en **app.log.1** :
+
+```bash
+sudo mv /var/log/apps/app.log /var/log/apps/app.log.1
+```
+
+Je vais recréer un fichier avec le même nom, **app.log** :
+
+```bash
+sudo touch /var/log/apps/app.log
+```
+
+Je vais ajouter un nouveau log dans ce fichier : 
+
+```bash
+INFO Nouveau fichier test après rotation
+```
+Grâce a cette requête sur Grafana je vois bien le log : 
+
+```bash
+{environment="development"} |= "Nouveau fichier"
+```
+<img width="1587" height="851" alt="image" src="https://github.com/user-attachments/assets/da6b7ae3-34e7-40d7-b6de-a4de2ad3c9ed" />
 
