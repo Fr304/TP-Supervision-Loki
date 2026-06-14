@@ -113,3 +113,84 @@ Grâce a cette requête sur Grafana je vois bien le log :
 <img width="1587" height="851" alt="image" src="https://github.com/user-attachments/assets/da6b7ae3-34e7-40d7-b6de-a4de2ad3c9ed" />
 
 Cette vérification indique que Grafana Alloy détecte automatiquement la rotation des fichiers et poursuit sa collecte de logs sans perte de données.
+
+### Exercice 4 : Pipelines Alloy et Parsing à la source
+
+Objectif : Transformer, filtrer et enrichir les structures de logs directement au niveau de la couche de collecte.
+
+Pour commencer, je vais créer un fichier nommé **users.json.log**
+
+```bash
+sudo touch /var/log/apps/users.json.log
+sudo nano /var/log/apps/users.json.log
+```
+
+Dans ce fichier, je vais inclure les lignes suivantes de log au format JSON :
+
+```bash
+{"level":"info","user_id":"1001","message":"Connexion utilisateur"}
+{"level":"debug","user_id":"1002","message":"Test debug"}
+{"level":"error","user_id":"1003","message":"Erreur application"}
+```
+
+Dans le fichier **config.alloy**, je vais ajouter une nouvelle pipeline avant la section **forward_to**
+
+```bash
+loki.process "json_logs" {
+  stage.json {
+    expressions = {
+      level   = "level",
+      user_id = "user_id",
+      message = "message",
+    }
+  }
+
+  stage.drop {
+    source     = "level"
+    expression = "debug"
+  }
+
+  stage.labels {
+    values = {
+      user_id = "",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
+```
+
+J'ai modifié la source pour que les logs soient traités par le pipeline json_logs avant d'être envoyés à Loki
+
+```bash
+loki.source.file "local_logs" {
+  targets    = local.file_match.local_logs.targets
+  forward_to = [loki.process.json_logs.receiver]
+}
+```
+
+Ensuite je vais recharger la configuration Alloy : 
+
+```bash
+docker restart alloy
+```
+
+Dans Grafana, grâce aux commandes suivantes, je parviens à voir les logs précédemment configurés :
+
+```bash
+{user_id="1001"}
+```
+<img width="1592" height="697" alt="image" src="https://github.com/user-attachments/assets/92928635-4613-4555-9620-9cfb6c15ebd8" />
+
+```bash
+{user_id="1003"}
+```
+<img width="1582" height="696" alt="image" src="https://github.com/user-attachments/assets/d62b9d6c-d0c7-4543-9aa8-335d21f1090a" />
+
+La requête ci-dessous ne retourne rien, car le niveau **debug** est filtré par la pipeline :
+
+```bash
+{user_id="1002"}
+```
+<img width="1592" height="643" alt="image" src="https://github.com/user-attachments/assets/31bf6bf7-aa31-4e53-9044-e70ce1594fc5" />
+
