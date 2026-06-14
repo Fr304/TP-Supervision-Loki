@@ -52,7 +52,7 @@ stage.label_drop {
 }
 ```
 
-### Exercice 2 : Rotation des logs et découverte dynamique
+### Exercice 3 : Rotation des logs et découverte dynamique
 
 Pour faire cet exercice, j'ai créé le répertoire **/var/log/apps** car il n'était pas présent sur mon serveur :
 
