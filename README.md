@@ -51,3 +51,39 @@ stage.label_drop {
   values = ["filename"]
 }
 ```
+
+### Exercice 2 : Rotation des logs et découverte dynamique
+
+Pour faire cet exercice, j'ai créé le répertoire **/var/log/apps** car il n'était pas présent sur mon serveur :
+
+```bash
+sudo mkdir -p /var/log/apps
+```
+Ensuite, j'ai créé un fichier de log nommé **app.log**. Celui-ci me permettra de simuler les logs d'une application :
+
+```bash
+sudo touch /var/log/apps/app.log
+```
+
+J'ai ajouté quelques lignes de logs manuellement dans ce fichier pour générer du contenu :
+
+```bash
+sudo nano /var/log/apps/app.log
+```
+```bash
+INFO Application démarrée
+ERROR Connexion base de données impossible
+```
+La configuration Alloy mise en place surveille déjà les fichiers de log présents dans le répertoire **/var/log**. Le fichier **app.log** sera donc détecté automatiquement.
+
+```bash
+__path__ = "/host/var/log/**/*.log"
+```
+
+Sur Grafana, je vois bien que les lignes de logs sont bien visibles :
+
+<img width="1603" height="857" alt="image" src="https://github.com/user-attachments/assets/40794a93-8c0b-4074-ae77-b644ed27a810" />
+<img width="1571" height="855" alt="image" src="https://github.com/user-attachments/assets/9a566523-a1ab-481f-b507-03720dfc2180" />
+
+
+
